@@ -104,6 +104,8 @@
             .modal-overlay{padding:12px;align-items:center}
             .modal-box{width:100%;max-width:560px;max-height:min(88dvh,720px);border-radius:16px;padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
             .modal-box .grid,.modal-box .flex,.modal-box .smart-dropdown,.modal-box input,.modal-box select,.modal-box textarea{min-width:0;max-width:100%}
+            .modal-box input[type="date"]{display:block;width:100%;min-width:0;max-width:100%;inline-size:100%;-webkit-appearance:none;appearance:none}
+            .modal-box input[type="date"]::-webkit-date-and-time-value{text-align:left;min-width:0}
             .modal-box p,.modal-box div{overflow-wrap:anywhere}
             .modal-box h2{font-size:18px;line-height:1.25;padding-right:8px}
             .modal-box .flex.gap-3.pt-2{flex-direction:column}
