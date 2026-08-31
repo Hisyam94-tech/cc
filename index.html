@@ -112,9 +112,10 @@
             .overflow-x-auto{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
             .modal-overlay{padding:12px;align-items:center}
             .modal-box{width:100%;max-width:560px;max-height:min(88dvh,720px);border-radius:16px;padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
-            .modal-header{top:-18px;margin:-18px -16px 18px;padding:15px 16px}
+            .modal-header{top:-18px;margin:-18px -16px 18px;padding:15px 16px;width:auto;max-width:none !important}
             .modal-box .grid,.modal-box .flex,.modal-box .smart-dropdown,.modal-box input,.modal-box select,.modal-box textarea{min-width:0;max-width:100%}
-            .modal-box .grid>div{width:100%;min-width:0;max-width:100%;overflow:hidden}
+            .modal-box .grid>div{width:100%;min-width:0;max-width:100%}
+            .modal-box .date-input-row{overflow:hidden}
             .modal-box input[type="date"]{display:block;box-sizing:border-box;width:100% !important;min-width:0 !important;max-width:100% !important;inline-size:-webkit-fill-available;min-inline-size:0 !important;max-inline-size:100% !important;-webkit-appearance:none;appearance:none}
             .modal-box input[type="date"]::-webkit-date-and-time-value{display:block;width:100%;min-width:0;max-width:100%;text-align:left;overflow:hidden}
             .modal-box p,.modal-box div{overflow-wrap:anywhere}
