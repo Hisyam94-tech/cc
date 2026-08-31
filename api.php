@@ -26,7 +26,7 @@ if (!$db) {
 $action = $_GET['action'] ?? '';
 
 function generateOrderNumber($db) {
-    $query = "SELECT MAX(CAST(SUBSTRING(order_number, 3) AS UNSIGNED)) as max_num FROM repair_orders";
+    $query = "SELECT MAX(CAST(SUBSTRING(order_number, 3) AS INTEGER)) as max_num FROM repair_orders";
     $stmt = $db->prepare($query);
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -344,7 +344,7 @@ switch ($action) {
             customer_name = :customer_name, phone = :phone, email = :email,
             device = :device, issue = :issue, estimated_cost = :estimated_cost,
             status = :status, date_received = :date_received, end_date = :end_date,
-            images = :images, components_changed = :components_changed,
+            images = :images, components_changed = :components_changed, updates = :updates,
             updated_at = CURRENT_TIMESTAMP
             WHERE id = :id";
 
@@ -361,7 +361,8 @@ switch ($action) {
             ':date_received'      => $dateReceived,
             ':end_date'           => $endDate,
             ':images'             => json_encode($images),
-            ':components_changed' => json_encode($componentsChanged)
+            ':components_changed' => json_encode($componentsChanged),
+            ':updates'            => json_encode($updates)
         ]);
 
         if ($result) {

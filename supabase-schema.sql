@@ -1,13 +1,3 @@
-# CircuitCare
-
-This project is a PHP repair-order tracking system that can be connected to Supabase instead of a MySQL host.
-
-## Supabase setup
-
-1. Create a new Supabase project.
-2. Open the SQL editor and run the SQL below to create the required tables:
-
-```sql
 CREATE TABLE IF NOT EXISTS repair_orders (
     id BIGSERIAL PRIMARY KEY,
     order_number VARCHAR(20) UNIQUE NOT NULL,
@@ -41,23 +31,8 @@ CREATE TABLE IF NOT EXISTS spare_parts (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-```
 
-3. In your PHP hosting environment, set one of these variables:
-
-```bash
-DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
-# or
-DB_HOST=db.[PROJECT-REF].supabase.co
-DB_PORT=5432
-DB_NAME=postgres
-DB_USERNAME=postgres
-DB_PASSWORD=[YOUR-PASSWORD]
-```
-
-4. Deploy the app and open the app; the database class will automatically connect through Supabase and create the tables if needed.
-
-## Notes
-
-- This project reads and writes arrays as JSON strings for the `images`, `components_changed`, and `updates` fields.
-- The database connection is now environment-driven, so you can switch between local PostgreSQL, Supabase, or the old MySQL setup without editing the logic again.
+CREATE INDEX IF NOT EXISTS idx_repair_orders_customer_name ON repair_orders (customer_name);
+CREATE INDEX IF NOT EXISTS idx_repair_orders_status ON repair_orders (status);
+CREATE INDEX IF NOT EXISTS idx_spare_parts_part_number ON spare_parts (part_number);
+CREATE INDEX IF NOT EXISTS idx_spare_parts_category ON spare_parts (category);
