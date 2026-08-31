@@ -97,6 +97,10 @@
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback } = React;
 
+const SUPABASE_URL = (window.SUPABASE_URL || '').replace(/\/+$/, '');
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
 const icons = {
     dashboard:'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z',
     orders:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z',
@@ -324,9 +328,6 @@ function RepairOrderSystem() {
     const [deviceOptions,setDeviceOptions]=useState([]);
 
     // GitHub Pages is static, so use Supabase directly from the browser.
-    const SUPABASE_URL = (window.SUPABASE_URL || '').replace(/\/+$/, '');
-    const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
-    const supabase = SUPABASE_URL && SUPABASE_ANON_KEY ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
     const API_URL = null;
 
     const toJsonArray = (value) => {
