@@ -72,10 +72,15 @@
         .form-label{display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:6px}
         .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9000;animation:fadeIn 0.2s ease}
         .modal-box{background:#fff;border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,0.15);padding:28px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;animation:slideIn 0.25s ease}
-        .modal-header{position:sticky;top:-28px;z-index:20;margin:-28px -28px 24px;padding:20px 28px;background:#fff;border-bottom:1px solid #f1f5f9}
+        .modal-header{position:sticky;top:-28px;z-index:20;margin:-28px -28px 24px;padding:20px 28px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-bottom:1px solid #1d4ed8}
+        .modal-header h2{color:#fff}
+        .modal-header>button{color:#fff;background:rgba(255,255,255,.14)}
+        .modal-header>button:hover{background:rgba(255,255,255,.24)}
+        .modal-header>button svg{color:inherit}
         .date-input-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;min-width:0}
         .date-clear-btn{height:42px;padding:0 12px;border:1px solid #e2e8f0;border-radius:9px;background:#f8fafc;color:#64748b;font-size:13px;font-weight:600;cursor:pointer}
         .date-clear-btn:hover{background:#f1f5f9;color:#334155}
+        .date-clear-btn:disabled{opacity:.45;cursor:not-allowed;background:#f8fafc;color:#94a3b8}
         .btn-primary{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#2563eb;color:#fff;border-radius:9px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all 0.15s ease}
         .btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}
         .btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#f1f5f9;color:#475569;border-radius:9px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all 0.15s ease}
@@ -1605,7 +1610,7 @@ tbody td:last-child{text-align:right;font-weight:600}
                                 <label className="form-label">Completion Date</label>
                                 <div className="date-input-row">
                                     <input className="form-input" type="date" value={formData.endDate} onChange={e=>setFormData(prev=>({...prev,endDate:e.target.value}))}/>
-                                    {formData.endDate&&<button type="button" className="date-clear-btn" onClick={()=>setFormData(prev=>({...prev,endDate:''}))}>Clear</button>}
+                                    <button type="button" className="date-clear-btn" disabled={!formData.endDate} onClick={()=>setFormData(prev=>({...prev,endDate:''}))}>Clear</button>
                                 </div>
                                 <p className="text-xs text-slate-400 mt-1">Required for revenue tracking</p>
                             </div>
