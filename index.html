@@ -71,8 +71,9 @@
         .form-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,0.12)}
         .form-label{display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:6px}
         .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9000;animation:fadeIn 0.2s ease}
-        .modal-box{background:#fff;border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,0.15);padding:28px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;animation:slideIn 0.25s ease}
-        .modal-header{position:sticky;top:0;z-index:20;margin:-28px -28px 24px;padding:20px 28px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-bottom:1px solid #1d4ed8}
+        .modal-box{background:#fff;border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,0.15);padding:0;width:100%;max-width:860px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;animation:slideIn 0.25s ease}
+        .modal-header{position:relative;z-index:20;margin:0;padding:20px 28px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-bottom:1px solid #1d4ed8;flex:0 0 auto;width:100%}
+        .modal-body{padding:24px 28px 28px;overflow-x:hidden;overflow-y:auto;min-height:0;overscroll-behavior:none}
         .modal-header h2{color:#fff}
         .modal-header>button{color:#fff;background:rgba(255,255,255,.14)}
         .modal-header>button:hover{background:rgba(255,255,255,.24)}
@@ -111,8 +112,9 @@
             .data-table td{padding:12px}
             .overflow-x-auto{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
             .modal-overlay{padding:12px;align-items:center}
-            .modal-box{width:100%;max-width:560px;max-height:min(88dvh,720px);border-radius:16px;padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow-x:hidden;overflow-y:auto;overscroll-behavior:none;-webkit-overflow-scrolling:auto}
-            .modal-header{top:0;margin:-18px -16px 18px;padding:15px 16px;width:auto;max-width:none !important}
+            .modal-box{width:100%;max-width:560px;max-height:min(88dvh,720px);border-radius:16px;padding:0;overflow:hidden}
+            .modal-header{margin:0;padding:15px 16px;width:100%;max-width:none !important}
+            .modal-body{padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow-x:hidden;overflow-y:auto;overscroll-behavior:none;-webkit-overflow-scrolling:touch}
             .modal-box .grid,.modal-box .flex,.modal-box .smart-dropdown,.modal-box input,.modal-box select,.modal-box textarea{min-width:0;max-width:100%}
             .modal-box .grid>div{width:100%;min-width:0;max-width:100%}
             .modal-box .date-input-row{overflow:hidden}
@@ -1453,7 +1455,7 @@ tbody td:last-child{text-align:right;font-weight:600}
                         <h2 className="text-xl font-bold text-slate-800">Order #{viewingOrder.order_number}</h2>
                         <button className="p-2 hover:bg-slate-100 rounded-lg" onClick={()=>setViewingOrder(null)}><SvgIcon name="x" size={20} className="text-slate-500"/></button>
                     </div>
-                    <div className="space-y-4">
+                    <div className="modal-body space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
                                 <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Customer</div>
@@ -1566,6 +1568,7 @@ tbody td:last-child{text-align:right;font-weight:600}
                         <h2 className="text-xl font-bold text-slate-800">{editingOrder?'Edit Repair Order':'Create New Repair Order'}</h2>
                         <button className="p-2 hover:bg-slate-100 rounded-lg" onClick={resetOrderForm}><SvgIcon name="x" size={20} className="text-slate-500"/></button>
                     </div>
+                    <div className="modal-body">
                     {apiError&&<div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">{apiError}</div>}
                     <div className="space-y-5">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1675,6 +1678,7 @@ tbody td:last-child{text-align:right;font-weight:600}
                             <button className="btn-secondary flex-1 justify-center" onClick={resetOrderForm}>Cancel</button>
                         </div>
                     </div>
+                    </div>
                 </div>
             </div>
         );
@@ -1690,6 +1694,7 @@ tbody td:last-child{text-align:right;font-weight:600}
                         <h2 className="text-xl font-bold text-slate-800">{editingSparePart?'Edit Spare Part':'Add New Spare Part'}</h2>
                         <button className="p-2 hover:bg-slate-100 rounded-lg" onClick={resetSparePartForm}><SvgIcon name="x" size={20} className="text-slate-500"/></button>
                     </div>
+                    <div className="modal-body">
                     {apiError&&<div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">{apiError}</div>}
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1716,6 +1721,7 @@ tbody td:last-child{text-align:right;font-weight:600}
                             <button className="btn-secondary flex-1 justify-center" onClick={resetSparePartForm}>Cancel</button>
                         </div>
                     </div>
+                    </div>
                 </div>
             </div>
         );
@@ -1728,7 +1734,7 @@ tbody td:last-child{text-align:right;font-weight:600}
                 <div className="mobile-header sticky top-0 z-30 bg-white border-b border-slate-200 px-4 h-14 items-center justify-between">
                     <button className="p-2 hover:bg-slate-100 rounded-lg" onClick={()=>setMobileSidebarOpen(true)}><SvgIcon name="menu" size={22} className="text-slate-600"/></button>
                     <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-lg flex items-center justify-center"><img src="CIRCUITCARE_new_logo-removebg.png" alt="" className="w-5 h-5 object-contain"/></div>
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center"><img src="CIRCUITCARE_new_logo-removebg.png" alt="CircuitCare" className="w-9 h-9 object-contain"/></div>
                         <span className="font-bold text-slate-800 text-sm">CircuitCare</span>
                     </div>
                     <div className="w-10"/>
