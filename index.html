@@ -72,6 +72,10 @@
         .form-label{display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:6px}
         .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9000;animation:fadeIn 0.2s ease}
         .modal-box{background:#fff;border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,0.15);padding:28px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;animation:slideIn 0.25s ease}
+        .modal-header{position:sticky;top:-28px;z-index:20;margin:-28px -28px 24px;padding:20px 28px;background:#fff;border-bottom:1px solid #f1f5f9}
+        .date-input-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;min-width:0}
+        .date-clear-btn{height:42px;padding:0 12px;border:1px solid #e2e8f0;border-radius:9px;background:#f8fafc;color:#64748b;font-size:13px;font-weight:600;cursor:pointer}
+        .date-clear-btn:hover{background:#f1f5f9;color:#334155}
         .btn-primary{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#2563eb;color:#fff;border-radius:9px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all 0.15s ease}
         .btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}
         .btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#f1f5f9;color:#475569;border-radius:9px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all 0.15s ease}
@@ -103,6 +107,7 @@
             .overflow-x-auto{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
             .modal-overlay{padding:12px;align-items:center}
             .modal-box{width:100%;max-width:560px;max-height:min(88dvh,720px);border-radius:16px;padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
+            .modal-header{top:-18px;margin:-18px -16px 18px;padding:15px 16px}
             .modal-box .grid,.modal-box .flex,.modal-box .smart-dropdown,.modal-box input,.modal-box select,.modal-box textarea{min-width:0;max-width:100%}
             .modal-box .grid>div{width:100%;min-width:0;max-width:100%;overflow:hidden}
             .modal-box input[type="date"]{display:block;box-sizing:border-box;width:100% !important;min-width:0 !important;max-width:100% !important;inline-size:-webkit-fill-available;min-inline-size:0 !important;max-inline-size:100% !important;-webkit-appearance:none;appearance:none}
@@ -1438,7 +1443,7 @@ tbody td:last-child{text-align:right;font-weight:600}
         return (
             <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)setViewingOrder(null)}}>
                 <div className="modal-box" style={{maxWidth:800}}>
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="modal-header flex items-center justify-between">
                         <h2 className="text-xl font-bold text-slate-800">Order #{viewingOrder.order_number}</h2>
                         <button className="p-2 hover:bg-slate-100 rounded-lg" onClick={()=>setViewingOrder(null)}><SvgIcon name="x" size={20} className="text-slate-500"/></button>
                     </div>
@@ -1551,7 +1556,7 @@ tbody td:last-child{text-align:right;font-weight:600}
         return (
             <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)resetOrderForm()}}>
                 <div className="modal-box" style={{maxWidth:860}}>
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="modal-header flex items-center justify-between">
                         <h2 className="text-xl font-bold text-slate-800">{editingOrder?'Edit Repair Order':'Create New Repair Order'}</h2>
                         <button className="p-2 hover:bg-slate-100 rounded-lg" onClick={resetOrderForm}><SvgIcon name="x" size={20} className="text-slate-500"/></button>
                     </div>
@@ -1598,7 +1603,10 @@ tbody td:last-child{text-align:right;font-weight:600}
                             </div>
                             <div>
                                 <label className="form-label">Completion Date</label>
-                                <input className="form-input" type="date" value={formData.endDate} onChange={e=>setFormData(prev=>({...prev,endDate:e.target.value}))}/>
+                                <div className="date-input-row">
+                                    <input className="form-input" type="date" value={formData.endDate} onChange={e=>setFormData(prev=>({...prev,endDate:e.target.value}))}/>
+                                    {formData.endDate&&<button type="button" className="date-clear-btn" onClick={()=>setFormData(prev=>({...prev,endDate:''}))}>Clear</button>}
+                                </div>
                                 <p className="text-xs text-slate-400 mt-1">Required for revenue tracking</p>
                             </div>
                         </div>
@@ -1672,7 +1680,7 @@ tbody td:last-child{text-align:right;font-weight:600}
         return (
             <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)resetSparePartForm()}}>
                 <div className="modal-box" style={{maxWidth:640}}>
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="modal-header flex items-center justify-between">
                         <h2 className="text-xl font-bold text-slate-800">{editingSparePart?'Edit Spare Part':'Add New Spare Part'}</h2>
                         <button className="p-2 hover:bg-slate-100 rounded-lg" onClick={resetSparePartForm}><SvgIcon name="x" size={20} className="text-slate-500"/></button>
                     </div>
