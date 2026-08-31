@@ -630,9 +630,8 @@ function RepairOrderSystem() {
                 updates: JSON.stringify(data.updates || [])
             };
 
-            if (safeImages.length === 0 && (data.images || []).length > 0) {
-                setApiError('Image upload was skipped because the selected files were too large. Please create the Supabase Storage bucket named "repair-images" or reduce the image size.');
-                return { success: false, message: 'Image upload too large.' };
+            if ((data.images || []).length > 0 && safeImages.length === 0) {
+                setApiError('Some selected images were too large to save. The order was saved without them.');
             }
 
             if (isEdit) {
@@ -787,6 +786,7 @@ function RepairOrderSystem() {
 
     const MAX_ORDER_IMAGES = 5;
     const STORAGE_BUCKET = 'repair-images';
+    const MAX_IMAGE_DATA_URL_CHARS = 180000;
 
     const compressImageDataUrl=(src, maxWidth=1200, quality=0.72)=>new Promise((resolve)=>{
         if (!src || typeof src !== 'string' || !src.startsWith('data:image')) {
@@ -822,7 +822,7 @@ function RepairOrderSystem() {
                 r.readAsDataURL(file);
             });
             const compact = await compressImageDataUrl(dataUrl, 1200, 0.72);
-            return { name: file.name, data: compact, type: file.type || 'image/jpeg' };
+            return compact.length <= MAX_IMAGE_DATA_URL_CHARS ? { name: file.name, data: compact, type: file.type || 'image/jpeg' } : null;
         }
 
         const safeName = (file.name || `image-${Date.now()}`).replace(/[^a-zA-Z0-9_.-]+/g, '_');
@@ -847,15 +847,17 @@ function RepairOrderSystem() {
                 r.readAsDataURL(file);
             });
             const compact = await compressImageDataUrl(dataUrl, 1200, 0.72);
-            return { name: file.name, data: compact, type: file.type || 'image/jpeg' };
+            return compact.length <= MAX_IMAGE_DATA_URL_CHARS ? { name: file.name, data: compact, type: file.type || 'image/jpeg' } : null;
         }
     };
 
     const sanitizeImagesForSave=(images)=>
         (Array.isArray(images) ? images : []).slice(0, MAX_ORDER_IMAGES).map((img)=>{
-            if (typeof img === 'string') return img;
+            if (typeof img === 'string') {
+                return img.length <= MAX_IMAGE_DATA_URL_CHARS ? img : '';
+            }
             if (img?.url) return img.url;
-            if (img?.data) return img.data;
+            if (img?.data) return img.data.length <= MAX_IMAGE_DATA_URL_CHARS ? img.data : '';
             return '';
         }).filter(Boolean);
 
@@ -872,8 +874,15 @@ function RepairOrderSystem() {
 
         const selectedFiles = files.slice(0, availableSlots);
         const imgs=await Promise.all(selectedFiles.map(async(f)=>uploadImageToStorage(f)));
+        const validImgs = (imgs || []).filter(Boolean);
 
-        setFormData(prev=>({...prev,images:[...prev.images,...imgs].slice(0, MAX_ORDER_IMAGES)}));
+        if (validImgs.length === 0) {
+            alert('Selected images are too large to save. Please choose smaller photos or reduce image size before uploading.');
+            e.target.value='';
+            return;
+        }
+
+        setFormData(prev=>({...prev,images:[...prev.images,...validImgs].slice(0, MAX_ORDER_IMAGES)}));
         e.target.value='';
     };
 
