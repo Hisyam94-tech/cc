@@ -312,10 +312,18 @@ function CustomerSearchDropdown({value, onSelect, onAddNew, supabaseClient, clas
                     query = query.ilike('customer_name', `%${search}%`);
                 }
 
-                const { data, error } = await query.limit(10);
+                const { data, error } = await query
+                    .order('created_at', { ascending: false })
+                    .limit(1000);
                 if (error) throw error;
 
-                const unique = [...new Map((data || []).map(row => [row.customer_name, row])).values()];
+                const customerMap=(data || []).reduce((map,row)=>{
+                    const name=String(row.customer_name||'').trim();
+                    const key=name.toLocaleLowerCase();
+                    if(name&&!map.has(key))map.set(key,{...row,customer_name:name});
+                    return map;
+                },new Map());
+                const unique=[...customerMap.values()].sort((a,b)=>a.customer_name.localeCompare(b.customer_name));
                 setResults(unique);
             } catch {
                 setResults([]);
