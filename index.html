@@ -212,7 +212,8 @@ function SmartDropdown({value,onChange,options,placeholder,onAddNew,addNewLabel,
                 <div className="smart-dropdown-list">
                     <div style={{padding:'8px 10px',borderBottom:'1px solid #f1f5f9'}}>
                         <input className="form-input" style={{padding:'6px 10px',fontSize:13}} placeholder="Search..."
-                            value={search} onChange={e=>setSearch(e.target.value)} autoFocus onClick={e=>e.stopPropagation()}/>
+                            value={search} onChange={e=>setSearch(e.target.value)}
+                            autoFocus={window.innerWidth>=768} onClick={e=>e.stopPropagation()}/>
                     </div>
                     {filtered.length===0&&<div className="smart-dropdown-item" style={{color:'#94a3b8',fontStyle:'italic'}}>No results found</div>}
                     {filtered.map((opt,i)=>{
@@ -293,7 +294,7 @@ function CustomerSearchDropdown({value, onSelect, onAddNew, supabaseClient, clas
                     <div style={{padding:'8px 10px',borderBottom:'1px solid #f1f5f9'}}>
                         <input className="form-input" style={{padding:'6px 10px',fontSize:13}}
                             placeholder="Type to search customers..."
-                            value={search} autoFocus
+                            value={search} autoFocus={window.innerWidth>=768}
                             onChange={e=>setSearch(e.target.value)}
                             onClick={e=>e.stopPropagation()}/>
                     </div>
