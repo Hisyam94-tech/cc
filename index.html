@@ -80,7 +80,24 @@
         .search-bar input{border:none;outline:none;font-size:14px;color:#334155;background:transparent;width:100%;font-family:'DM Sans',sans-serif}
         .page-header{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:20}
         @keyframes spin{to{transform:rotate(360deg)}}
-        @media(max-width:767px){.sidebar-wrapper{display:none}.main-content{margin-left:0}.mobile-header{display:flex !important}}
+        @media(max-width:767px){
+            .sidebar-wrapper{display:none}.main-content{margin-left:0}.mobile-header{display:flex !important}
+            .page-header{padding:16px;flex-direction:column;align-items:stretch;gap:12px}
+            .page-header > div{width:100%}
+            .page-header button,.page-header .btn-primary,.page-header .btn-purple{width:100%;justify-content:center}
+            .p-6{padding:16px !important}
+            .search-bar{min-width:0;flex:1}
+            .bg-white.rounded-2xl .flex.items-center.gap-4{flex-wrap:wrap}
+            .modal-box{padding:20px 16px;max-height:92vh;border-radius:14px}
+            .modal-overlay{padding:10px}
+            .update-input-row{flex-direction:column}
+            .update-input-row button{width:100%}
+            .flex.gap-3.pt-2{flex-direction:column}
+            .grid.grid-cols-3.md\:grid-cols-5.gap-2.mt-3{grid-template-columns:repeat(2,minmax(0,1fr))}
+            .data-table th,.data-table td{padding:10px 12px}
+            .stat-card{padding:18px}
+            .fixed.bottom-4.right-4.md\:hidden{right:12px;bottom:12px}
+        }
         .mobile-header{display:none}
 
         /* Update panel inside modal */
@@ -597,6 +614,7 @@ function RepairOrderSystem() {
                 throw new Error('Supabase is not configured.');
             }
 
+            const safeImages = sanitizeImagesForSave(data.images || []);
             const payload = {
                 customer_name: data.customerName || '',
                 phone: data.phone || '',
@@ -607,10 +625,15 @@ function RepairOrderSystem() {
                 status: data.status || 'in-progress',
                 date_received: data.dateReceived || new Date().toISOString().split('T')[0],
                 end_date: data.endDate || null,
-                images: JSON.stringify(data.images || []),
+                images: JSON.stringify(safeImages),
                 components_changed: JSON.stringify(data.componentsChanged || []),
                 updates: JSON.stringify(data.updates || [])
             };
+
+            if (safeImages.length === 0 && (data.images || []).length > 0) {
+                setApiError('Image upload was skipped because the selected files were too large. Please create the Supabase Storage bucket named "repair-images" or reduce the image size.');
+                return { success: false, message: 'Image upload too large.' };
+            }
 
             if (isEdit) {
                 const { error } = await supabase
@@ -630,7 +653,7 @@ function RepairOrderSystem() {
             return { success: true };
         }catch(err){
             console.error(err);
-            setApiError('Failed to save order. Check your Supabase settings.');
+            setApiError('Failed to save order. Check your Supabase settings and ensure the "repair-images" storage bucket exists.');
             return { success: false, message: 'Failed to save order.' };
         }
     };
@@ -762,9 +785,96 @@ function RepairOrderSystem() {
     const resetOrderForm=()=>{setFormData(orderFormDataInitial);setShowForm(false);setEditingOrder(null)};
     const resetSparePartForm=()=>{setSparePartFormData(sparePartFormDataInitial);setShowSparePartForm(false);setEditingSparePart(null)};
 
-    const handleImageUpload=(e)=>{
-        const files=Array.from(e.target.files);
-        Promise.all(files.map(f=>new Promise(res=>{const r=new FileReader();r.onloadend=()=>res({name:f.name,data:r.result,type:f.type});r.readAsDataURL(f)}))).then(imgs=>setFormData(prev=>({...prev,images:[...prev.images,...imgs]})));
+    const MAX_ORDER_IMAGES = 5;
+    const STORAGE_BUCKET = 'repair-images';
+
+    const compressImageDataUrl=(src, maxWidth=1200, quality=0.72)=>new Promise((resolve)=>{
+        if (!src || typeof src !== 'string' || !src.startsWith('data:image')) {
+            resolve(src);
+            return;
+        }
+
+        const img=new Image();
+        img.onload=()=>{
+            const canvas=document.createElement('canvas');
+            const scale=Math.min(1, maxWidth / img.width);
+            canvas.width=Math.max(1, Math.round(img.width * scale));
+            canvas.height=Math.max(1, Math.round(img.height * scale));
+            const ctx=canvas.getContext('2d');
+            if (!ctx) {
+                resolve(src);
+                return;
+            }
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const compressed = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressed.length < src.length ? compressed : src);
+        };
+        img.onerror=()=>resolve(src);
+        img.src=src;
+    });
+
+    const uploadImageToStorage=async(file)=>{
+        if (!supabase) {
+            const dataUrl = await new Promise((resolve,reject)=>{
+                const r=new FileReader();
+                r.onloadend=()=>resolve(String(r.result || ''));
+                r.onerror=()=>reject(new Error('Image read failed'));
+                r.readAsDataURL(file);
+            });
+            const compact = await compressImageDataUrl(dataUrl, 1200, 0.72);
+            return { name: file.name, data: compact, type: file.type || 'image/jpeg' };
+        }
+
+        const safeName = (file.name || `image-${Date.now()}`).replace(/[^a-zA-Z0-9_.-]+/g, '_');
+        const path = `orders/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}`;
+
+        try {
+            const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, { cacheControl: '3600', upsert: false });
+            if (error) throw error;
+
+            const { data: publicData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+            return {
+                name: file.name,
+                url: publicData?.publicUrl || '',
+                type: file.type || 'image/jpeg'
+            };
+        } catch (err) {
+            console.warn('Storage upload failed, falling back to compressed data URL.', err);
+            const dataUrl = await new Promise((resolve,reject)=>{
+                const r=new FileReader();
+                r.onloadend=()=>resolve(String(r.result || ''));
+                r.onerror=()=>reject(new Error('Image read failed'));
+                r.readAsDataURL(file);
+            });
+            const compact = await compressImageDataUrl(dataUrl, 1200, 0.72);
+            return { name: file.name, data: compact, type: file.type || 'image/jpeg' };
+        }
+    };
+
+    const sanitizeImagesForSave=(images)=>
+        (Array.isArray(images) ? images : []).slice(0, MAX_ORDER_IMAGES).map((img)=>{
+            if (typeof img === 'string') return img;
+            if (img?.url) return img.url;
+            if (img?.data) return img.data;
+            return '';
+        }).filter(Boolean);
+
+    const handleImageUpload=async(e)=>{
+        const files=Array.from(e.target.files || []);
+        if (!files.length) return;
+
+        const availableSlots = Math.max(0, MAX_ORDER_IMAGES - (formData.images?.length || 0));
+        if (availableSlots <= 0) {
+            alert(`You can upload up to ${MAX_ORDER_IMAGES} images per order.`);
+            e.target.value='';
+            return;
+        }
+
+        const selectedFiles = files.slice(0, availableSlots);
+        const imgs=await Promise.all(selectedFiles.map(async(f)=>uploadImageToStorage(f)));
+
+        setFormData(prev=>({...prev,images:[...prev.images,...imgs].slice(0, MAX_ORDER_IMAGES)}));
+        e.target.value='';
     };
 
     const addComponent=()=>setFormData(prev=>({...prev,componentsChanged:[...prev.componentsChanged,{id:Date.now(),name:'',cost:''}]}));
@@ -797,7 +907,6 @@ function RepairOrderSystem() {
     const generateInvoice=(order)=>{
         const components=order.componentsChanged||[];
         const sub=components.reduce((s,c)=>s+(parseFloat(c.cost)||0),0);
-
 
         const html=`<!DOCTYPE html>
 <html lang="en">
@@ -936,7 +1045,20 @@ tbody td:last-child{text-align:right;font-weight:600}
 </div>
 </body>
 </html>`;
-        const w=window.open('','_blank');w.document.write(html);w.document.close();
+
+        const blob = new Blob([html], { type: 'text/html' });
+        const blobUrl = URL.createObjectURL(blob);
+        const popup = window.open(blobUrl, '_blank', 'noopener,noreferrer');
+
+        if (!popup) {
+            alert('Please allow popups to generate the invoice.');
+            URL.revokeObjectURL(blobUrl);
+            return;
+        }
+
+        setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+        }, 1500);
     };
 
     // ── Sidebar ───────────────────────────────────────────────────────────────
