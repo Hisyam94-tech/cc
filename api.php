@@ -1,9 +1,30 @@
 <?php
-// api.php - Updated for InfinityFree MySQL with spare parts functionality and updates field
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+// api.php - Updated for Supabase/Postgres compatibility with explicit CORS for GitHub Pages and local dev
+$allowedOrigins = [
+    'https://hisyam94-tech.github.io',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost',
+    'https://localhost'
+];
+
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+header('Content-Type: application/json; charset=UTF-8');
+
+if ($origin && in_array($origin, $allowedOrigins, true)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
+} elseif ($origin) {
+    header('Access-Control-Allow-Origin: https://hisyam94-tech.github.io');
+    header('Vary: Origin');
+} else {
+    header('Access-Control-Allow-Origin: *');
+}
+
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Access-Control-Allow-Headers');
+header('Access-Control-Allow-Credentials: true');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
