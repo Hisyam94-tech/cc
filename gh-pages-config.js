@@ -1,1 +1,2 @@
-window.CC_API_URL = 'http://127.0.0.1:8000/api.php';
+window.SUPABASE_URL = 'https://vcydonmiwbyqxpndbloq.supabase.co';
+window.SUPABASE_ANON_KEY = 'sb_publishable_NH6GQ1cyh6qQJCfjQH-jwA_cRPckoqa';
