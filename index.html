@@ -95,8 +95,8 @@
         @media(max-width:767px){
             .sidebar-wrapper{display:none}
             .main-content{margin-left:0;width:100%;min-width:0;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
-            .mobile-header{display:flex !important;padding-top:env(safe-area-inset-top);height:calc(88px + env(safe-area-inset-top))}
-            .page-header{top:calc(88px + env(safe-area-inset-top));padding:14px 16px;align-items:flex-start;gap:12px;flex-wrap:wrap}
+            .mobile-header{display:flex !important;padding-top:env(safe-area-inset-top);height:calc(56px + env(safe-area-inset-top));overflow:visible}
+            .page-header{top:calc(56px + env(safe-area-inset-top));padding:14px 16px;align-items:flex-start;gap:12px;flex-wrap:wrap}
             .page-header>div:first-child{min-width:0;flex:1 1 180px}
             .page-header>div:first-child p{font-size:12px;line-height:1.35;margin-top:2px}
             .page-header>div:last-child{width:100%;display:flex;gap:8px;flex-wrap:wrap}
@@ -1734,7 +1734,7 @@ tbody td:last-child{text-align:right;font-weight:600}
                 <div className="mobile-header sticky top-0 z-30 bg-white border-b border-slate-200 px-4 h-14 items-center justify-between">
                     <button className="p-2 hover:bg-slate-100 rounded-lg" onClick={()=>setMobileSidebarOpen(true)}><SvgIcon name="menu" size={22} className="text-slate-600"/></button>
                     <div className="flex items-center gap-2">
-                        <div className="w-20 h-20 rounded-lg flex items-center justify-center"><img src="CIRCUITCARE_new_logo-removebg.png" alt="CircuitCare" className="w-[72px] h-[72px] object-contain"/></div>
+                        <div className="w-16 h-14 rounded-lg flex items-center justify-center"><img src="CIRCUITCARE_new_logo-removebg.png" alt="CircuitCare" className="w-[72px] h-[72px] max-w-none object-contain"/></div>
                         <span className="font-bold text-slate-800 text-xl">CircuitCare</span>
                     </div>
                     <div className="w-10"/>
