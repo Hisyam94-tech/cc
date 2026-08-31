@@ -700,7 +700,7 @@ function RepairOrderSystem() {
                 device: data.device || '',
                 issue: data.issue || '',
                 estimated_cost: Number(data.estimatedCost || 0),
-                status: data.status || 'in-progress',
+                status: data.endDate ? 'completed' : (data.status || 'in-progress'),
                 date_received: data.dateReceived || new Date().toISOString().split('T')[0],
                 end_date: data.endDate || null,
                 images: JSON.stringify(safeImages),
@@ -954,7 +954,7 @@ function RepairOrderSystem() {
 
     const handleEdit=(order)=>{
         setEditingOrder(order);
-        setFormData({customerName:order.customer_name,phone:order.phone,email:order.email||'',device:order.device,issue:order.issue,status:order.status,dateReceived:order.date_received,endDate:order.end_date||'',images:order.images||[],componentsChanged:order.componentsChanged||[],updates:order.updates||[]});
+        setFormData({customerName:order.customer_name,phone:order.phone,email:order.email||'',device:order.device,issue:order.issue,status:order.end_date?'completed':order.status,dateReceived:order.date_received,endDate:order.end_date||'',images:order.images||[],componentsChanged:order.componentsChanged||[],updates:order.updates||[]});
         setShowForm(true);
     };
 
@@ -1650,7 +1650,7 @@ tbody td:last-child{text-align:right;font-weight:600}
                             <div>
                                 <label className="form-label">Completion Date</label>
                                 <div className="date-input-row">
-                                    <input className="form-input" type="date" value={formData.endDate} onChange={e=>setFormData(prev=>({...prev,endDate:e.target.value}))}/>
+                                    <input className="form-input" type="date" value={formData.endDate} onChange={e=>setFormData(prev=>({...prev,endDate:e.target.value,status:e.target.value?'completed':prev.status}))}/>
                                     <button type="button" className="date-clear-btn" disabled={!formData.endDate} onClick={()=>setFormData(prev=>({...prev,endDate:''}))}>Clear</button>
                                 </div>
                                 <p className="text-xs text-slate-400 mt-1">Required for revenue tracking</p>
