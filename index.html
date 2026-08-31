@@ -101,14 +101,14 @@
             .data-table th{padding:10px 12px}
             .data-table td{padding:12px}
             .overflow-x-auto{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
-            .modal-overlay{padding:0;align-items:flex-end}
-            .modal-box{max-height:calc(100dvh - env(safe-area-inset-top));border-radius:18px 18px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));overscroll-behavior:contain}
+            .modal-overlay{padding:12px;align-items:center}
+            .modal-box{width:100%;max-width:560px;max-height:min(88dvh,720px);border-radius:16px;padding:18px 16px calc(18px + env(safe-area-inset-bottom));overscroll-behavior:contain}
             .modal-box h2{font-size:18px;line-height:1.25;padding-right:8px}
             .modal-box .flex.gap-3.pt-2{flex-direction:column}
             .modal-box .flex.gap-3.pt-2>button{width:100%;flex:none;justify-content:center}
             .modal-box .flex.items-center.gap-2:has(>input.form-input){flex-wrap:wrap}
             .modal-box .flex.items-center.gap-2>input.form-input[style]{width:calc(100% - 44px) !important;flex:1 1 calc(100% - 44px)}
-            .smart-dropdown-list{position:fixed;left:12px;right:12px;top:auto;bottom:calc(12px + env(safe-area-inset-bottom));max-height:min(55dvh,420px);z-index:10000}
+            .smart-dropdown-list{position:absolute;left:0;right:0;top:calc(100% + 4px);bottom:auto;max-height:min(220px,40dvh);z-index:10000}
             .update-input-row{flex-direction:column}
             .update-input-row button{min-height:44px}
         }
