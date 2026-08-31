@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./gh-pages-config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -311,7 +312,9 @@ function RepairOrderSystem() {
     const [phoneOptions,setPhoneOptions]=useState([]);
     const [deviceOptions,setDeviceOptions]=useState([]);
 
-    const API_URL='https://circuitcaremonitor.infinityfreeapp.com/api.php';
+    // IMPORTANT: GitHub Pages is static, so this must point to a real backend or Supabase endpoint.
+    // Set window.CC_API_URL before the app loads if you are hosting the frontend on GitHub Pages.
+    const API_URL = (window.CC_API_URL || 'http://127.0.0.1:8000/api.php').replace(/\/+$/, '');
 
     const orderFormDataInitial={
         customerName:'',phone:'',email:'',device:'',issue:'',
