@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>CircuitCare | Repair Order Management</title>
     <link rel="icon" type="image/png" href="CIRCUITCARE_new_logo-removebg.png">
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
@@ -33,7 +33,9 @@
     </script>
     <style>
         *{box-sizing:border-box}
-        body{font-family:'DM Sans',sans-serif;background:#f5f7fa}
+        html{width:100%;min-height:100%;overflow-x:hidden;-webkit-text-size-adjust:100%}
+        body{font-family:'DM Sans',sans-serif;background:#f5f7fa;width:100%;min-height:100%;margin:0;overflow-x:hidden;overscroll-behavior-x:none}
+        button,input,select,textarea{touch-action:manipulation}
         .sidebar-wrapper{position:fixed;top:0;left:0;bottom:0;z-index:40;width:56px;overflow:hidden;transition:width 0.25s cubic-bezier(0.4,0,0.2,1)}
         .sidebar-wrapper.expanded{width:240px}
         .sidebar-panel{position:absolute;left:0;top:0;bottom:0;width:240px;background:#fff;border-right:1px solid #e2e8f0;box-shadow:4px 0 20px rgba(0,0,0,0.07);display:flex;flex-direction:column;overflow:hidden}
@@ -80,7 +82,42 @@
         .search-bar input{border:none;outline:none;font-size:14px;color:#334155;background:transparent;width:100%;font-family:'DM Sans',sans-serif}
         .page-header{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:20}
         @keyframes spin{to{transform:rotate(360deg)}}
-        @media(max-width:767px){.sidebar-wrapper{display:none}.main-content{margin-left:0}.mobile-header{display:flex !important}}
+        @media(max-width:767px){
+            .sidebar-wrapper{display:none}
+            .main-content{margin-left:0;width:100%;min-width:0;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+            .mobile-header{display:flex !important;padding-top:env(safe-area-inset-top);height:calc(56px + env(safe-area-inset-top))}
+            .page-header{top:calc(56px + env(safe-area-inset-top));padding:14px 16px;align-items:flex-start;gap:12px;flex-wrap:wrap}
+            .page-header>div:first-child{min-width:0;flex:1 1 180px}
+            .page-header>div:first-child p{font-size:12px;line-height:1.35;margin-top:2px}
+            .page-header>div:last-child{width:100%;display:flex;gap:8px;flex-wrap:wrap}
+            .page-header>div:last-child>*{flex:1 1 auto;min-width:0}
+            .page-header>.btn-primary,.page-header>.btn-purple{display:none}
+            .main-content>div>div.p-6{padding:16px}
+            .stat-card{padding:18px}
+            .search-bar{min-width:0;padding:9px 11px}
+            .search-bar input{font-size:16px}
+            .form-input{font-size:16px}
+            .data-table{min-width:720px}
+            .data-table th{padding:10px 12px}
+            .data-table td{padding:12px}
+            .overflow-x-auto{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+            .modal-overlay{padding:0;align-items:flex-end}
+            .modal-box{max-height:calc(100dvh - env(safe-area-inset-top));border-radius:18px 18px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));overscroll-behavior:contain}
+            .modal-box h2{font-size:18px;line-height:1.25;padding-right:8px}
+            .modal-box .flex.gap-3.pt-2{flex-direction:column}
+            .modal-box .flex.gap-3.pt-2>button{width:100%;flex:none;justify-content:center}
+            .modal-box .flex.items-center.gap-2:has(>input.form-input){flex-wrap:wrap}
+            .modal-box .flex.items-center.gap-2>input.form-input[style]{width:calc(100% - 44px) !important;flex:1 1 calc(100% - 44px)}
+            .smart-dropdown-list{position:fixed;left:12px;right:12px;top:auto;bottom:calc(12px + env(safe-area-inset-bottom));max-height:min(55dvh,420px);z-index:10000}
+            .update-input-row{flex-direction:column}
+            .update-input-row button{min-height:44px}
+        }
+        @media(max-width:420px){
+            .page-header{padding:12px}
+            .main-content>div>div.p-6{padding:12px}
+            .grid.grid-cols-2.lg\:grid-cols-4{grid-template-columns:1fr}
+            .bg-white.rounded-2xl.border.p-5{padding:16px}
+        }
         .mobile-header{display:none}
 
         /* Update panel inside modal */
