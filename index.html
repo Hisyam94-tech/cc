@@ -91,11 +91,25 @@
         .search-bar{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:9px 14px;flex:1}
         .search-bar input{border:none;outline:none;font-size:14px;color:#334155;background:transparent;width:100%;font-family:'DM Sans',sans-serif}
         .page-header{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:20}
+        /* CircuitCare blue-gradient theme */
+        .main-content{background:linear-gradient(145deg,#eff6ff 0%,#f8fbff 48%,#dbeafe 100%)}
+        .page-header{background:linear-gradient(135deg,#0f3d91 0%,#2563eb 58%,#38bdf8 100%);border-bottom-color:#60a5fa;box-shadow:0 6px 22px rgba(37,99,235,.18)}
+        .page-header h1,.page-header p{color:#fff !important}
+        .page-header p{opacity:.82}
+        .btn-primary,.btn-purple{background:linear-gradient(135deg,#2563eb,#0ea5e9);box-shadow:0 5px 14px rgba(37,99,235,.22)}
+        .btn-primary:hover,.btn-purple:hover{background:linear-gradient(135deg,#1d4ed8,#0284c7)}
+        .stat-card{background:linear-gradient(145deg,#fff 30%,#eff6ff 100%);border-color:#bfdbfe;box-shadow:0 8px 24px rgba(37,99,235,.08)}
+        .modal-body{background:linear-gradient(160deg,#fff 0%,#eff6ff 100%)}
+        .search-bar{background:linear-gradient(135deg,#fff,#f0f7ff);border-color:#bfdbfe}
         @keyframes spin{to{transform:rotate(360deg)}}
         @media(max-width:767px){
             .sidebar-wrapper{display:none}
             .main-content{margin-left:0;width:100%;min-width:0;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
             .mobile-header{display:flex !important;padding-top:env(safe-area-inset-top);height:calc(56px + env(safe-area-inset-top));overflow:visible}
+            .mobile-header{background:linear-gradient(135deg,#0f3d91,#2563eb 65%,#38bdf8) !important;border-bottom-color:#60a5fa !important;box-shadow:0 5px 18px rgba(30,64,175,.22)}
+            .mobile-header>button,.mobile-header>div>span{color:#fff !important}
+            .mobile-header svg{color:#fff !important}
+            .mobile-header>div>div{background:rgba(255,255,255,.9)}
             .page-header{top:calc(56px + env(safe-area-inset-top));padding:14px 16px;align-items:flex-start;gap:12px;flex-wrap:wrap}
             .page-header>div:first-child{min-width:0;flex:1 1 180px}
             .page-header>div:first-child p{font-size:12px;line-height:1.35;margin-top:2px}
