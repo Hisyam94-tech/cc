@@ -189,10 +189,9 @@ function SmartDropdown({value,onChange,options,placeholder,onAddNew,addNewLabel,
     );
 }
 
-// ── CustomerSearchDropdown — live DB search ───────────────────────────────────
-// Queries get_customers?search=... on every keystroke (debounced 300 ms).
-// On select, calls onSelect({customer_name, phone, email}) for auto-fill.
-function CustomerSearchDropdown({value, onSelect, onAddNew, apiUrl, className=''}) {
+// ── CustomerSearchDropdown — live Supabase search ───────────────────────────
+// Uses the browser-side Supabase client directly and does not call a localhost PHP API.
+function CustomerSearchDropdown({value, onSelect, onAddNew, supabaseClient, className=''}) {
     const [open, setOpen]       = useState(false);
     const [search, setSearch]   = useState('');
     const [results, setResults] = useState([]);
@@ -206,23 +205,34 @@ function CustomerSearchDropdown({value, onSelect, onAddNew, apiUrl, className=''
         return()=>document.removeEventListener('mousedown',h);
     },[]);
 
-    // Fetch from DB whenever search text changes (debounced 300 ms)
     useEffect(()=>{
-        if(!open) return;
+        if(!open || !supabaseClient) return;
         clearTimeout(timerRef.current);
         timerRef.current = setTimeout(async()=>{
             setLoading(true);
             try {
-                const url = `${apiUrl}?action=get_customers${search?'&search='+encodeURIComponent(search):''}`;
-                const res  = await fetch(url);
-                const json = await res.json();
-                if(json.success) setResults(json.data||[]);
-                else setResults([]);
-            } catch { setResults([]); }
+                let query = supabaseClient
+                    .from('repair_orders')
+                    .select('customer_name, phone, email')
+                    .not('customer_name', 'is', null)
+                    .neq('customer_name', '');
+
+                if (search) {
+                    query = query.ilike('customer_name', `%${search}%`);
+                }
+
+                const { data, error } = await query.limit(10);
+                if (error) throw error;
+
+                const unique = [...new Map((data || []).map(row => [row.customer_name, row])).values()];
+                setResults(unique);
+            } catch {
+                setResults([]);
+            }
             setLoading(false);
         }, 300);
         return()=>clearTimeout(timerRef.current);
-    },[search, open]);
+    },[search, open, supabaseClient]);
 
     const handleOpen=()=>{ setOpen(true); setSearch(''); setResults([]); };
 
@@ -317,7 +327,7 @@ function RepairOrderSystem() {
     const SUPABASE_URL = (window.SUPABASE_URL || '').replace(/\/+$/, '');
     const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
     const supabase = SUPABASE_URL && SUPABASE_ANON_KEY ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-    const API_URL = SUPABASE_URL || 'http://127.0.0.1:8000/api.php';
+    const API_URL = null;
 
     const toJsonArray = (value) => {
         if (typeof value === 'string') {
@@ -1410,7 +1420,7 @@ tbody td:last-child{text-align:right;font-weight:600}
                                     value={formData.customerName}
                                     onSelect={(row)=>setFormData(prev=>({...prev,customerName:row.customer_name,phone:row.phone||prev.phone,email:row.email||prev.email}))}
                                     onAddNew={(val)=>setFormData(prev=>({...prev,customerName:val||''}))}
-                                    apiUrl={API_URL}/>
+                                    supabaseClient={supabase}/>
                             </div>
                             <div>
                                 <label className="form-label">Phone Number *</label>
