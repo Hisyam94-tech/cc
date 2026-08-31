@@ -96,7 +96,7 @@
             .stat-card{padding:18px}
             .search-bar{min-width:0;padding:9px 11px}
             .search-bar input{font-size:16px}
-            .form-input{font-size:16px}
+            .form-input,.smart-dropdown-list input,.update-input-row input{font-size:16px !important}
             .data-table{min-width:720px}
             .data-table th{padding:10px 12px}
             .data-table td{padding:12px}
@@ -834,41 +834,22 @@ function RepairOrderSystem() {
     });
 
     const uploadImageToStorage=async(file)=>{
-        if (!supabase) {
-            const dataUrl = await new Promise((resolve,reject)=>{
-                const r=new FileReader();
-                r.onloadend=()=>resolve(String(r.result || ''));
-                r.onerror=()=>reject(new Error('Image read failed'));
-                r.readAsDataURL(file);
-            });
-            const compact = await compressImageDataUrl(dataUrl, 1200, 0.72);
-            return compact.length <= MAX_IMAGE_DATA_URL_CHARS ? { name: file.name, data: compact, type: file.type || 'image/jpeg' } : null;
-        }
+        if (!supabase) throw new Error('Supabase is not configured. Original images require Supabase Storage.');
 
         const safeName = (file.name || `image-${Date.now()}`).replace(/[^a-zA-Z0-9_.-]+/g, '_');
         const path = `orders/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}`;
 
-        try {
-            const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, { cacheControl: '3600', upsert: false });
-            if (error) throw error;
+        const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, {
+            cacheControl: '3600',
+            contentType: file.type || undefined,
+            upsert: false
+        });
+        if (error) throw new Error(`Original image upload failed: ${error.message}`);
 
-            const { data: publicData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-            return {
-                name: file.name,
-                url: publicData?.publicUrl || '',
-                type: file.type || 'image/jpeg'
-            };
-        } catch (err) {
-            console.warn('Storage upload failed, falling back to compressed data URL.', err);
-            const dataUrl = await new Promise((resolve,reject)=>{
-                const r=new FileReader();
-                r.onloadend=()=>resolve(String(r.result || ''));
-                r.onerror=()=>reject(new Error('Image read failed'));
-                r.readAsDataURL(file);
-            });
-            const compact = await compressImageDataUrl(dataUrl, 1200, 0.72);
-            return compact.length <= MAX_IMAGE_DATA_URL_CHARS ? { name: file.name, data: compact, type: file.type || 'image/jpeg' } : null;
-        }
+        const { data: publicData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+        const publicUrl = publicData?.publicUrl || '';
+        if (!publicUrl) throw new Error('Supabase did not return an image URL.');
+        return { name: file.name, url: publicUrl, type: file.type || 'application/octet-stream' };
     };
 
     const sanitizeImagesForSave=(images)=>
@@ -895,11 +876,12 @@ function RepairOrderSystem() {
         }
 
         const selectedFiles = files.slice(0, availableSlots);
-        const imgs=await Promise.all(selectedFiles.map(async(f)=>uploadImageToStorage(f)));
-        const validImgs = (imgs || []).filter(Boolean);
-
-        if (validImgs.length === 0) {
-            alert('Selected images are too large to save. Please choose smaller photos or reduce image size before uploading.');
+        let validImgs=[];
+        try {
+            validImgs=await Promise.all(selectedFiles.map(uploadImageToStorage));
+        } catch (err) {
+            console.error(err);
+            alert(`${err.message}\n\nThe original image was not resized or compressed.`);
             e.target.value='';
             return;
         }
