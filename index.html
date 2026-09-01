@@ -949,8 +949,8 @@ function RepairOrderSystem() {
     };
 
     const addComponent=()=>setFormData(prev=>({...prev,componentsChanged:[...prev.componentsChanged,{id:Date.now(),name:'',cost:''}]}));
-    const updateComponent=(id,field,val)=>setFormData(prev=>({...prev,componentsChanged:prev.componentsChanged.map(c=>c.id===id?{...c,[field]:val}:c)}));
-    const removeComponent=(id)=>setFormData(prev=>({...prev,componentsChanged:prev.componentsChanged.filter(c=>c.id!==id)}));
+    const updateComponent=(index,field,val)=>setFormData(prev=>({...prev,componentsChanged:prev.componentsChanged.map((c,i)=>i===index?{...c,[field]:val}:c)}));
+    const removeComponent=(index)=>setFormData(prev=>({...prev,componentsChanged:prev.componentsChanged.filter((_,i)=>i!==index)}));
 
     const handleEdit=(order)=>{
         setEditingOrder(order);
@@ -1694,11 +1694,11 @@ tbody td:last-child{text-align:right;font-weight:600}
                             </div>
                             {formData.componentsChanged.length>0&&(
                                 <div className="space-y-2">
-                                    {formData.componentsChanged.map(c=>(
-                                        <div key={c.id} className="flex items-center gap-2">
-                                            <input className="form-input flex-1" placeholder="Component name" value={c.name} onChange={e=>updateComponent(c.id,'name',e.target.value)}/>
-                                            <input className="form-input" style={{width:130}} type="number" step="0.01" placeholder="Cost (RM)" value={c.cost} onChange={e=>updateComponent(c.id,'cost',e.target.value)}/>
-                                            <button className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 flex-shrink-0" onClick={()=>removeComponent(c.id)}><SvgIcon name="trash" size={16}/></button>
+                                    {formData.componentsChanged.map((c,index)=>(
+                                        <div key={c.id??`component-${index}`} className="flex items-center gap-2">
+                                            <input className="form-input flex-1" placeholder="Component name" value={c.name??''} onChange={e=>updateComponent(index,'name',e.target.value)}/>
+                                            <input className="form-input" style={{width:130}} type="number" step="0.01" placeholder="Cost (RM)" value={c.cost??''} onChange={e=>updateComponent(index,'cost',e.target.value)}/>
+                                            <button className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 flex-shrink-0" onClick={()=>removeComponent(index)}><SvgIcon name="trash" size={16}/></button>
                                         </div>
                                     ))}
                                 </div>
